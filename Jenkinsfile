@@ -59,8 +59,7 @@ pipeline {
      }
     
      stage('Post Build Actions') {
-      steps('Email All')
-      {
+      steps {
         emailext attachLog: true, 
          body: 'Check console output at $BUILD_URL to view the results.', 
          subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', 
