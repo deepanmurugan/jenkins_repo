@@ -14,7 +14,7 @@ pipeline {
         dir('/tmp/pipeline-project-1')
         {
           // Get some code from a GitHub repository
-         checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: ${github_branch}]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: ${github_repo}]]]
+         checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: 'https://github.com/deepanmurugan/jenkins_repo.git']]]
         }
        }
       }
