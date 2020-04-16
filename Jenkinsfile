@@ -64,7 +64,7 @@ pipeline {
         emailext attachLog: true, 
          body: 'Check console output at $BUILD_URL to view the results.', 
          subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', 
-         to: ${ops_mail_group}
+         to: "${ops_mail_group}"
       }
      }
   }
