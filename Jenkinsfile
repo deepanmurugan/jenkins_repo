@@ -2,11 +2,6 @@ pipeline {
 
  agent { node { label 'cloud' } }
  
-  environment { 
-    github_repo = 'https://github.com/deepanmurugan/jenkins_repo.git'
-    github_branch = '*/master'
-  }
- 
     stages {
      
      stage('SCM Fetch') {
