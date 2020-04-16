@@ -5,7 +5,7 @@ pipeline {
   environment { 
     github_repo = 'https://github.com/deepanmurugan/jenkins_repo.git'
     github_branch = '*/master'
-   
+    build_path = /tmp/${BUILD_NAME}
   }
     stages {
      
@@ -22,7 +22,7 @@ pipeline {
      stage('Build') {
       steps {
        // Run the build
-       sh label: '', script: '''cd /tmp/pipeline-project-1/
+       sh label: '', script: '''cd ${build_path}
        ls -ltr
        hostname -I'''
        echo 'Building the code'
