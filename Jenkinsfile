@@ -1,9 +1,12 @@
 pipeline {
 
  agent {
+  
    node {
-     label: 'cloud'
     
+     label: 'cloud'
+    stages {
+     
      stage('SCM Fetch') {
        dir('/tmp/pipeline-project-1')
        {
@@ -36,5 +39,6 @@ pipeline {
         }
      }
    }
+  }
  }
 }
