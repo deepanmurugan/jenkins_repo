@@ -1,3 +1,6 @@
+// Define variable
+def gitbranch = "*/master"
+
 pipeline {
 
  agent { node { label 'cloud' } }
@@ -9,7 +12,7 @@ pipeline {
         dir('/tmp/pipeline-project-1')
         {
           // Get some code from a GitHub repository
-         checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: 'https://github.com/deepanmurugan/jenkins_repo.git']]]
+         checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: ${gitbranch}]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: 'https://github.com/deepanmurugan/jenkins_repo.git']]]
         }
        }
       }
