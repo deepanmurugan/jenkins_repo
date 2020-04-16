@@ -39,12 +39,10 @@ pipeline {
      }
     
      stage('Post Build Actions') {
-      steps {
-        emailext attachLog: true, 
-         body: 'Check console output at $BUILD_URL to view the results.', 
-         subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', 
-         to: 'opsworksnoreply@noreply.com'
+      steps('Email All')
+      {
+        emailext attachLog: true, body: 'Check console output at $BUILD_URL to view the results.', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', to: 'noreply@noreply.com'
       }
      }
-  }
+   }
 }
