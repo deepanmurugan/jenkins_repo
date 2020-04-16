@@ -5,7 +5,7 @@ pipeline {
   environment { 
     github_repo = 'https://github.com/deepanmurugan/jenkins_repo.git'
     github_branch = '*/master'
-    build_path = /tmp/${BUILD_NAME}
+    build_path = '/tmp/${BUILD_NAME}'
   }
     stages {
      
