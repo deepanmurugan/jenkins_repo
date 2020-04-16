@@ -5,8 +5,9 @@ pipeline {
   environment { 
     github_repo = 'https://github.com/deepanmurugan/jenkins_repo.git'
     github_branch = '*/master'
-    build_path = '/tmp/${BUILD_NAME}'
+    ops_mail_group = 'opsworksnoreply@noreply.com'
   }
+ 
     stages {
      
      stage('SCM Fetch') {
@@ -14,7 +15,26 @@ pipeline {
         dir('/tmp/pipeline-project-1')
         {
           // Get some code from a GitHub repository
-         checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: ${github_branch}]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: ${github_repo}]]]
+         checkout poll: false, 
+          scm: [
+           $class: 'GitSCM', 
+           branches: [
+            [name: ${github_branch}]
+           ], 
+           doGenerateSubmoduleConfigurations: false, 
+           extensions: [
+            [$class: 'CloneOption', 
+             noTags: false, 
+             reference: '', 
+             shallow: false, 
+             timeout: 10]
+           ], 
+           submoduleCfg: [], 
+           userRemoteConfigs: [
+            [credentialsId: 'github-password', 
+             url: ${github_repo}]
+           ]
+          ]
         }
        }
       }
@@ -22,7 +42,7 @@ pipeline {
      stage('Build') {
       steps {
        // Run the build
-       sh label: '', script: '''cd ${build_path}
+       sh label: '', script: '''cd /tmp/pipeline-project-1
        ls -ltr
        hostname -I'''
        echo 'Building the code'
@@ -41,7 +61,10 @@ pipeline {
      stage('Post Build Actions') {
       steps('Email All')
       {
-        emailext attachLog: true, body: 'Check console output at $BUILD_URL to view the results.', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', to: 'deepan.gctpro@gmail.com'
+        emailext attachLog: true, 
+         body: 'Check console output at $BUILD_URL to view the results.', 
+         subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', 
+         to: ${ops_mail_group}
       }
      }
   }
