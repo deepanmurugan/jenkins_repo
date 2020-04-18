@@ -47,11 +47,16 @@ pipeline {
        }
       }
       
-     stage('Confirmation Stage')
+     stage('Confirmation Stage') {
       steps {
        input id: 'Pipeline_project_build', message: 'Do you want to proceed to production?', submitter: 'deepan'
       }
     }
      
+     stage('Depoy to production') {
+      steps {
+       echo 'Deploying to Production'
+      }
+    }
   }
 }
