@@ -2,7 +2,7 @@ pipeline {
 
  agent { node { label 'cloud' } }
  
-    stages {
+   stages {
      
      stage('SCM Fetch') {
       steps {
@@ -46,6 +46,7 @@ pipeline {
        s3Upload consoleLogLevel: 'INFO', dontSetBuildResultOnFailure: false, dontWaitForConcurrentBuildCompletion: false, entries: [[bucket: 'projcts-artifacts/${JOB_NAME}-${BUILD_NUMBER}', excludedFile: '', flatten: true, gzipFiles: false, keepForever: false, managedArtifacts: true, noUploadOnFailure: true, selectedRegion: 'us-east-2', showDirectlyInBrowser: false, sourceFile: '*gz', storageClass: 'STANDARD', uploadFromSlave: true, useServerSideEncryption: false, userMetadata: [[key: '', value: '']]]], pluginFailureResultConstraint: 'FAILURE', profileName: 'aws-s3-profile', userMetadata: []
        }
       }
+     }
       
      stage('Confirmation Stage') {
       steps {
@@ -58,5 +59,6 @@ pipeline {
        echo 'Deploying to Production'
       }
     }
+      
   }
 }
