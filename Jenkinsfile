@@ -49,6 +49,7 @@ pipeline {
      }
       
      stage('Confirmation Stage') {
+      agent none
       steps {
        input id: 'Pipeline_project_build', message: 'Do you want to proceed to production?', submitter: 'deepan'
       }
