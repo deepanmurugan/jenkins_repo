@@ -51,7 +51,7 @@ pipeline {
      stage('Confirmation Stage') {
       agent none
       steps {
-       input id: 'Pipeline_project_build', message: 'Do you want to proceed to production?', submitter: 'approver', parameters: [string(defaultValue: 'Any Comments', description: '', name: 'Option', trim: true)]
+       input id: 'Pipeline_project_build', message: 'Do you want to proceed to production?', submitter: 'approver', parameters: [string(defaultValue: 'Any Comments', description: '', name: 'Any Comments to Approve/Reject', trim: true)]
       }
     }
      
