@@ -49,32 +49,45 @@ pipeline {
         }
      }
     
-     stage('Post Build Actions') {
+     stage('Post Build Actions - Email for Approval') {
       steps {
         emailext attachLog: true, body: 'Check console output at $BUILD_URL and Approve/Reject.', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', to: 'deepan.gctpro@gmail.com'
       }
      }
       
-     stage('Upload to S3') {
-      steps {
-       s3Upload consoleLogLevel: 'INFO', dontSetBuildResultOnFailure: false, dontWaitForConcurrentBuildCompletion: false, entries: [[bucket: 'projcts-artifacts/${JOB_NAME}-${BUILD_NUMBER}', excludedFile: '', flatten: true, gzipFiles: false, keepForever: false, managedArtifacts: true, noUploadOnFailure: true, selectedRegion: 'us-east-2', showDirectlyInBrowser: false, sourceFile: '*.war', storageClass: 'STANDARD', uploadFromSlave: true, useServerSideEncryption: false, userMetadata: [[key: '', value: '']]]], pluginFailureResultConstraint: 'FAILURE', profileName: 'aws-s3-profile', userMetadata: []
-       }
-     }
-      
-     stage('Confirmation Stage') {
+     stage('Approve the build to stage?') {
       agent none
       steps {
        input id: 'Pipeline_project_build', message: 'Do you want to proceed to production?', submitter: 'approver', parameters: [string(defaultValue: '', description: '', name: 'Any Comments to Approve/Reject', trim: true)]
       }
     }
+    
+     stage('Upload Artifacts to S3') {
+      steps {
+       s3Upload consoleLogLevel: 'INFO', dontSetBuildResultOnFailure: false, dontWaitForConcurrentBuildCompletion: false, entries: [[bucket: 'projcts-artifacts/${JOB_NAME}-${BUILD_NUMBER}', excludedFile: '', flatten: true, gzipFiles: false, keepForever: false, managedArtifacts: true, noUploadOnFailure: true, selectedRegion: 'us-east-2', showDirectlyInBrowser: false, sourceFile: '*.war', storageClass: 'STANDARD', uploadFromSlave: true, useServerSideEncryption: false, userMetadata: [[key: '', value: '']]]], pluginFailureResultConstraint: 'FAILURE', profileName: 'aws-s3-profile', userMetadata: []
+       }
+     }
      
-     stage('Depoy to Staging') {
+     stage('Depoying to Staging') {
       steps {
        sh label: '', script: 'sudo apt install ansible -y'
        ansiblePlaybook become: true, extras: '-e ansible_python_interpreter=/usr/bin/python3', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/install_sensu_client.yml'
        echo 'Deploying to Production'
       }
+     }
+    
+    stage('Approve the build to Production?') {
+      agent none
+      steps {
+       input id: 'Pipeline_project_build', message: 'Do you want to proceed to production?', submitter: 'approver', parameters: [string(defaultValue: '', description: '', name: 'Any Comments to Approve/Reject', trim: true)]
+      }
     }
-      
+    
+    stage('Depoying to Production') {
+      steps {
+       sh label: '', script: 'sudo apt install ansible -y'
+       ansiblePlaybook become: true, extras: '-e ansible_python_interpreter=/usr/bin/python3', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/install_sensu_client.yml'
+       echo 'Deploying to Production'
+      }
   }
 }
