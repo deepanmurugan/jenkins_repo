@@ -71,7 +71,7 @@ pipeline {
      stage('Depoy to Staging') {
       steps {
        sh label: '', script: 'sudo apt install ansible -y'
-       ansiblePlaybook credentialsId: 'deepan-ssh-access-key', installation: 'ansible', inventory: '/tmp/ansible-playbooks/ec2.py', playbook: '/tmp/ansible-playbooks/deploy-tomcat.yml'
+       ansiblePlaybook credentialsId: 'deepan-ssh-access-key', installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/deploy-tomcat.yml'
        echo 'Deploying to Production'
       }
     }
