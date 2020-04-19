@@ -1,17 +1,19 @@
 pipeline {
 
- agent { node { label 'cloud' } }
+ agent { 
+  node { 
+   label 'cloud'
+   customWorkspace '/tmp/multibranch'
+  } 
+ }
  
    stages {
      
      stage('SCM Fetch') {
       steps {
-        dir('/tmp/pipeline-project-1')
-        {
           // Get some code from a GitHub repository
          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: 'https://github.com/deepanmurugan/jenkins_repo.git']]]
         }
-       }
       }
     
     stage('Sonarqube scan code') {
@@ -40,11 +42,9 @@ pipeline {
 
      stage('Achive Artifacts') {
       steps {
-       dir('/tmp/pipeline-project-1') {
           archiveArtifacts '*.war'
           echo 'Archive is completed'
         }
-      }
      }
     
      stage('Post Build Actions') {
@@ -55,10 +55,8 @@ pipeline {
       
      stage('Upload to S3') {
       steps {
-       dir('/tmp/pipeline-project-1') {
        s3Upload consoleLogLevel: 'INFO', dontSetBuildResultOnFailure: false, dontWaitForConcurrentBuildCompletion: false, entries: [[bucket: 'projcts-artifacts/${JOB_NAME}-${BUILD_NUMBER}', excludedFile: '', flatten: true, gzipFiles: false, keepForever: false, managedArtifacts: true, noUploadOnFailure: true, selectedRegion: 'us-east-2', showDirectlyInBrowser: false, sourceFile: '*.war', storageClass: 'STANDARD', uploadFromSlave: true, useServerSideEncryption: false, userMetadata: [[key: '', value: '']]]], pluginFailureResultConstraint: 'FAILURE', profileName: 'aws-s3-profile', userMetadata: []
        }
-      }
      }
       
      stage('Confirmation Stage') {
