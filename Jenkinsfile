@@ -21,11 +21,12 @@ pipeline {
        steps {
        withSonarQubeEnv('sonar_jenkins') {
             sh "${scannerHome}/bin/sonar-scanner"
-        timeout(time: 1, unit: 'HOURS')
+        }
+        timeout(time: 1, unit: 'HOURS') {
          waitForQualityGate abortPipeline: true
         }
-       }
-     }
+      }
+    }
    
      stage('Build') {
       steps {
