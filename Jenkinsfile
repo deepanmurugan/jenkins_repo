@@ -12,6 +12,8 @@ pipeline {
      stage('SCM Fetch') {
       steps {
           // Get some code from a GitHub repository
+       echo ${JOB_NAME}
+       echo ${}
          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: 'https://github.com/deepanmurugan/jenkins_repo.git']]]
          dir('/tmp/ansible-playbooks/') {
           checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: 'https://github.com/deepanmurugan/Ansible_Playbook.git']]]
@@ -86,7 +88,7 @@ pipeline {
     stage('Depoying to Production') {
       steps {
        sh label: '', script: 'sudo apt install ansible -y'
-       ansiblePlaybook become: true, extras: '-e ansible_python_interpreter=/usr/bin/python3', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/install_sensu_client.yml'
+       ansiblePlaybook become: true, extras: '-e ansible_python_interpreter=/usr/bin/python3, jobname=${JOB_NAME}, branchname=${BRANCH_NAME}, buildno=${BUILD_NUMBER}', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/install_war.yml'
        echo 'Deploying to Production'
       }
   }
