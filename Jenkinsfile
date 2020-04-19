@@ -13,6 +13,9 @@ pipeline {
       steps {
           // Get some code from a GitHub repository
          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: 'https://github.com/deepanmurugan/jenkins_repo.git']]]
+         dir('/tmp/ansible-playbooks/') {
+          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: 'https://github.com/deepanmurugan/Ansible_Playbook.git']]]
+         }
         }
       }
     
@@ -65,8 +68,10 @@ pipeline {
       }
     }
      
-     stage('Depoy to production') {
+     stage('Depoy to Staging') {
       steps {
+       sh label: '', script: 'sudo yum install ansible -y'
+       ansiblePlaybook credentialsId: 'deepan-ssh-access-key', installation: 'ansible', inventory: '/tmp/ansible-playbooks/ec2.py', playbook: '/tmp/ansible-playbooks/deploy-tomcat.yml'
        echo 'Deploying to Production'
       }
     }
