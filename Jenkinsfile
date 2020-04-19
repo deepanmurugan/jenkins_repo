@@ -71,7 +71,7 @@ pipeline {
      stage('Depoy to Staging') {
       steps {
        sh label: '', script: 'sudo apt install ansible -y'
-       ansiblePlaybook become: true, credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/install_sensu_client.yml'
+       ansiblePlaybook become: true, extras: 'ansible_python_interpreter=/usr/bin/python3', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/install_sensu_client.yml'
        echo 'Deploying to Production'
       }
     }
