@@ -29,7 +29,7 @@ pipeline {
       steps {
        // Run the build
        sh label: '', script: '''cd /tmp/pipeline-project-1
-       jar -cvf jar -cvf samplenew.war *
+       jar -cvf samplenew.war *
        hostname -I'''
        echo 'Building the code'
        }
