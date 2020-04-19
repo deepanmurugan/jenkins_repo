@@ -13,13 +13,26 @@ pipeline {
         }
        }
       }
+    
+    stage('Sonarqube scan code') {
+      environment {
+        scannerHome = tool 'sonar_jenkins'
+       }
+       steps {
+       withSonarQubeEnv('sonar_jenkins') {
+            sh "${scannerHome}/bin/sonar-scanner"
+         }
+         timeout(time: 10, unit: 'MINUTES') {
+            waitForQualityGate abortPipeline: true
+         }
+       }
+     }
    
      stage('Build') {
       steps {
        // Run the build
        sh label: '', script: '''cd /tmp/pipeline-project-1
-       ls -ltr
-       tar -cvzf artifact.tar.gz *
+       jar -cvf jar -cvf samplenew.war *
        hostname -I'''
        echo 'Building the code'
        }
@@ -28,7 +41,7 @@ pipeline {
      stage('Achive Artifacts') {
       steps {
        dir('/tmp/pipeline-project-1') {
-          archiveArtifacts '*.tar.gz'
+          archiveArtifacts '*.war'
           echo 'Archive is completed'
         }
       }
