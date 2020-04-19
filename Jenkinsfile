@@ -72,7 +72,7 @@ pipeline {
      stage('Depoying to Staging') {
       steps {
        sh label: '', script: 'sudo apt install ansible -y'
-       ansiblePlaybook become: true, extras: "-e ansible_python_interpreter=/usr/bin/python3, jobname=${JOB_NAME}, branchname=${BRANCH_NAME}, buildno=${BUILD_NUMBER}", credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/install_war.yml'
+       ansiblePlaybook become: true, extras: '-e ansible_python_interpreter=/usr/bin/python3, jobname=${JOB_NAME} branchname=${BRANCH_NAME} buildno=${BUILD_NUMBER}', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/install_war.yml'
        echo 'Deploying to Production'
       }
      }
