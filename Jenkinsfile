@@ -33,8 +33,7 @@ pipeline {
      stage('Build') {
       steps {
        // Run the build
-       sh label: '', script: '''cd /tmp/pipeline-project-1
-       jar -cvf samplenew.war *
+       sh label: '', script: '''jar -cvf samplenew.war *
        hostname -I'''
        echo 'Building the code'
        }
