@@ -72,24 +72,10 @@ pipeline {
      stage('Depoying to Staging') {
       steps {
        sh label: '', script: 'sudo apt install ansible -y'
-       ansiblePlaybook become: true, extras: '-e ansible_python_interpreter=/usr/bin/python3', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/install_sensu_client.yml'
+       ansiblePlaybook become: true, extras: '-e ansible_python_interpreter=/usr/bin/python3, jobname=${JOB_NAME}, branchname=${BRANCH_NAME}, buildno=${BUILD_NUMBER}', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/install_war.yml'
        echo 'Deploying to Production'
       }
      }
     
-    stage('Approve the build to Production?') {
-      agent none
-      steps {
-       input id: 'Pipeline_project_build', message: 'Do you want to proceed to production?', submitter: 'approver', parameters: [string(defaultValue: '', description: '', name: 'Any Comments to Approve/Reject', trim: true)]
-      }
-    }
-    
-    stage('Depoying to Production') {
-      steps {
-       sh label: '', script: 'sudo apt install ansible -y'
-       ansiblePlaybook become: true, extras: '-e ansible_python_interpreter=/usr/bin/python3, jobname=${JOB_NAME}, branchname=${BRANCH_NAME}, buildno=${BUILD_NUMBER}', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/install_war.yml'
-       echo 'Deploying to Production'
-      }
-    }
   }
 }
