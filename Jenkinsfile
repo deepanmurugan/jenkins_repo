@@ -76,7 +76,6 @@ pipeline {
        sudo apt-get install python-pip -y
        sudo pip install boto
        export EC2_INI_PATH=/tmp/ansible-playbooks/ec2.ini
-       sudo echo "EC2_INI_PATH=/tmp/ansible-playbooks/ec2.ini" >> /etc/environment
        source /etc/environment
        sudo chmod 777 /tmp/ansible-playbooks/ec2.py'''
        ansiblePlaybook become: true, extras: '"-e ansible_python_interpreter=/usr/bin/python3 jobname=${JOB_NAME} branchname=${BRANCH_NAME} buildno=${BUILD_NUMBER}"', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/ec2.py', limit: '"Env_stage:&Role_appserver"', playbook: '/tmp/ansible-playbooks/install_war.yml'
