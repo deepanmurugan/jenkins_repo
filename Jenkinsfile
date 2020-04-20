@@ -10,15 +10,24 @@ pipeline {
    stages {
      
      stage('SCM Fetch') {
-      steps {
+      parallel {
+       
+       stage {
+        steps {
           // Get some code from a GitHub repository
-       echo "${JOB_NAME}"
-         checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: 'https://github.com/deepanmurugan/jenkins_repo.git']]]
-         dir('/tmp/ansible-playbooks/') {
-          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: 'https://github.com/deepanmurugan/Ansible_Playbook.git']]]
-         }
+          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: 'https://github.com/deepanmurugan/jenkins_repo.git']]]
         }
+       }
+       stage {
+        steps {
+          dir('/tmp/ansible-playbooks/') {
+          checkout poll: false, scm: [$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'CloneOption', noTags: false, reference: '', shallow: false, timeout: 10]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'github-password', url: 'https://github.com/deepanmurugan/Ansible_Playbook.git']]]
+          }
+        }
+       }
+       
       }
+     }
     
     stage('Sonarqube scan code') {
       environment {
@@ -59,7 +68,7 @@ pipeline {
      stage('Approve the build to stage?') {
       agent none
       steps {
-       input id: 'Pipeline_project_build', message: 'Do you want to proceed to production?', submitter: 'approver', parameters: [string(defaultValue: '', description: '', name: 'Any Comments to Approve/Reject', trim: true)]
+       input id: 'Pipeline_project_build', message: 'Do you want to proceed to staging?', submitter: 'approver', parameters: [string(defaultValue: '', description: '', name: 'Any Comments to Approve/Reject', trim: true)]
       }
     }
     
@@ -80,6 +89,20 @@ pipeline {
        source /etc/environment
        sudo chmod 777 /tmp/ansible-playbooks/ec2.py'''
        ansiblePlaybook become: true, extras: '"-e ansible_python_interpreter=/usr/bin/python3 jobname=${JOB_NAME} branchname=${BRANCH_NAME} buildno=${BUILD_NUMBER}"', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/ec2.py', limit: 'Env_stage:&Role_appserver', playbook: '/tmp/ansible-playbooks/install_war.yml'
+       echo 'Deploying to Staging'
+      }
+     }
+    
+      stage('Approve the build to production?') {
+      agent none
+      steps {
+       input id: 'Pipeline_project_build', message: 'Do you want to proceed to production?', submitter: 'approver', parameters: [string(defaultValue: '', description: '', name: 'Any Comments to Approve/Reject', trim: true)]
+      }
+    }
+    
+    stage('Depoying to Production') {
+      steps {
+       ansiblePlaybook become: true, extras: '"-e ansible_python_interpreter=/usr/bin/python3 jobname=${JOB_NAME} branchname=${BRANCH_NAME} buildno=${BUILD_NUMBER}"', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/ec2.py', limit: 'Env_prod:&Role_appserver', playbook: '/tmp/ansible-playbooks/install_war.yml'
        echo 'Deploying to Staging'
       }
      }
