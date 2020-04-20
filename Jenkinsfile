@@ -71,7 +71,7 @@ pipeline {
      
      stage('Depoying to Staging') {
       steps {
-       bash '''#!/bin/bash
+       sh label: '', script: '''#!/bin/bash
        sudo apt-get install ansible -y
        sudo apt-get install python -y
        sudo apt-get install python-pip -y
