@@ -4,7 +4,6 @@ pipeline {
   node { 
    label 'cloud'
    customWorkspace '/tmp/multibranch'
-   emailaddress 'dharshini.cdm12@gmail.com'
   } 
  }
  
@@ -53,7 +52,7 @@ pipeline {
     
      stage('Post Build Actions - Email for Approval') {
       steps {
-        emailext attachLog: true, body: 'Check console output at $BUILD_URL and Approve/Reject.', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', to: '${emailaddress}'
+        emailext attachLog: true, body: 'Check console output at $BUILD_URL and Approve/Reject.', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', to: 'deepan.gctprod@gmail.com'
       }
      }
       
@@ -72,9 +71,13 @@ pipeline {
      
      stage('Depoying to Staging') {
       steps {
-       sh label: '', script: 'sudo apt-get install ansible -y'
-       ansiblePlaybook become: true, extras: '"-e ansible_python_interpreter=/usr/bin/python3 jobname=${JOB_NAME} branchname=${BRANCH_NAME} buildno=${BUILD_NUMBER}"', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/inv.ini', playbook: '/tmp/ansible-playbooks/install_war.yml'
-       echo 'Deploying to Production'
+       sh label: '', script: '''sudo apt-get install ansible -y
+       sudo apt-get install python -y
+       sudo apt-get install python-pip
+       sudo pip install boto
+       export EC2_INI_PATH=/tmp/ansible-playbooks/ec2.ini'''
+       ansiblePlaybook become: true, extras: '"-e ansible_python_interpreter=/usr/bin/python3 jobname=${JOB_NAME} branchname=${BRANCH_NAME} buildno=${BUILD_NUMBER}"', credentialsId: 'deepan-ssh-access-key', disableHostKeyChecking: true, installation: 'ansible', inventory: '/tmp/ansible-playbooks/ec2.py', limit: '"Env_stage:&Role_appserver"', playbook: '/tmp/ansible-playbooks/install_war.yml'
+       echo 'Deploying to Staging'
       }
      }
     
